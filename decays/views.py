@@ -1,12 +1,18 @@
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+
+from rest_framework.permissions import IsAuthenticated
 
 from decays.models import *
 from decays.serializers import DecayTypeSerializer
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from django.utils.six import BytesIO
+
+from rest_framework import generics
+from django.contrib.auth.models import User
+from decays.serializers import UserSerializer
 
 from django.http import HttpResponse
 import json
@@ -17,7 +23,36 @@ import random
 def hello_world(request):
     return Response({"message": "Hello, world!"})
 
+
+# to force authentication:
+# http://www.django-rest-framework.org/api-guide/permissions/
+# from rest_framework.decorators import api_view, permission_classes
+# from rest_framework.permissions import IsAuthenticated
+# @permission_classes((IsAuthenticated, ))
+#
+# NICE!!!
+#
+# WORKING HERE: add log in, etc., and try to make decay_type_list only
+#               accessible if the person is logged in....
+# ALSO: json field.... https://github.com/bradjasper/django-jsonfield
+#
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+# to force authentication:
+# http://www.django-rest-framework.org/api-guide/permissions/
+# now, using httpie:
+# http -a username:password GET http://127.0.0.1:8000/api/decaytypelist/
+# ...gets in!
 @api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
 def decay_type_list(request):
     """
     List all types of decays.
@@ -27,7 +62,9 @@ def decay_type_list(request):
         serializer = DecayTypeSerializer(decay_types, many=True)
         return Response(serializer.data)
 
+
 @api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
 def generate_random_event(request):
     """
     Generate a random event.  b_field should be a number (strength of the B field in kG);
