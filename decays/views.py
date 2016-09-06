@@ -19,6 +19,31 @@ import json
 
 import random
 
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
+
+from .permissions import IsStaffOrTargetUser
+
+# ISSUES(?):
+# - at this point, when a new user is created, a hashed version of the new user's
+#   password is returned to the client...is that bad?!?  probably!
+# - when using postman to get a list of accounts, it is only requiring a user
+#   to be logged in; it is not checking to see if the user is_staff
+
+
+
+# https://richardtier.com/2014/02/25/django-rest-framework-user-endpoint/
+class UserView(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    #model = User
+    queryset = User.objects.all()
+
+    def get_permissions(self):
+        # allow non-authenticated user to create via POST
+        return (AllowAny() if self.request.method == 'POST'
+                else IsStaffOrTargetUser()),
+
+
 @api_view()
 def hello_world(request):
     return Response({"message": "Hello, world!"})

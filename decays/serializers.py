@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from decays.models import DecayType
+from django.contrib.auth.models import User
 
 class DecayTypeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,12 +11,28 @@ class DecayTypeSerializer(serializers.ModelSerializer):
                   'daughter_three','daughter_three_alias',
                   'name')
 
-from django.contrib.auth.models import User
-
+# http://www.unknownerror.org/opensource/tomchristie/django-rest-framework/q/stackoverflow/16857450/how-to-register-users-in-django-rest-framework
 class UserSerializer(serializers.ModelSerializer):
   #snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())
 
-  class Meta:
-      model = User
-      fields = ('id', 'username')
+    class Meta:
+        model = User
+        fields = ('id', 'username','password', 'email', 'first_name', 'last_name')
+        write_only_fields = ('password',)
+        read_only_fields = ('id', 'is_staff', 'is_superuser', 'is_active', 'date_joined',)
+
+      # fields = ('id', 'username')
       #, 'snippets')
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name']
+        )
+
+        user.set_password(validated_data['password'])
+        user.save()
+
+        return user
