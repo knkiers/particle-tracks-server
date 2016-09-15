@@ -35,6 +35,15 @@ class AliasName(models.Model):
     def __unicode__(self):
         return self.name
 
+class AnalyzedEvent(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=100, blank=True, default='')
+    owner = models.ForeignKey('auth.User', related_name='analyzed_events')
+
+    def __unicode__(self):
+        return self.title
+
+
 class DecayType(models.Model):
     """
     A particular subatomic decay mode.  Notes: (i) can accommodate 1 -> 2

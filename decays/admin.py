@@ -8,3 +8,4 @@ class ParticleAdmin(admin.ModelAdmin):
 admin.site.register(Particle, ParticleAdmin)
 admin.site.register(AliasName)
 admin.site.register(DecayType)
+admin.site.register(AnalyzedEvent)
