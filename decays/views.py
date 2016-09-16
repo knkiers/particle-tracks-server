@@ -2,7 +2,10 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 
+from rest_framework import permissions
+
 from rest_framework.permissions import IsAuthenticated
+from decays.permissions import IsOwnerOrReadOnly
 
 from decays.models import *
 from decays.serializers import DecayTypeSerializer
@@ -12,7 +15,7 @@ from django.utils.six import BytesIO
 
 from rest_framework import generics
 from django.contrib.auth.models import User
-from decays.serializers import UserSerializer
+from decays.serializers import UserSerializer, AnalyzedEventSerializer
 
 from django.http import HttpResponse
 import json
@@ -57,9 +60,8 @@ def hello_world(request):
 #
 # NICE!!!
 #
-# WORKING HERE: add log in, etc., and try to make decay_type_list only
-#               accessible if the person is logged in....
-# ALSO: json field.... https://github.com/bradjasper/django-jsonfield
+# WORKING HERE:
+#  json field.... https://github.com/bradjasper/django-jsonfield
 #
 
 class UserList(generics.ListAPIView):
@@ -70,6 +72,34 @@ class UserList(generics.ListAPIView):
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+# WORKING HERE:
+# next...add class-based view(?) for AnalyzedEvents
+# ...and an AnalyzedEvent serializer;
+# possibly use the following: http://www.django-rest-framework.org/tutorial/3-class-based-views/#using-generic-class-based-views
+# ...but don't forget this: http://www.django-rest-framework.org/tutorial/4-authentication-and-permissions/#associating-snippets-with-users
+
+
+# maybe can use the @permission_classes decorator; also, maybe want to change
+# to IsAuthenticated
+class AnalyzedEventList(generics.ListCreateAPIView):
+    queryset = AnalyzedEvent.objects.all()
+    serializer_class = AnalyzedEventSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class AnalyzedEventDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = AnalyzedEvent.objects.all()
+    serializer_class = AnalyzedEventSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly,)
+
+
+
 
 # to force authentication:
 # http://www.django-rest-framework.org/api-guide/permissions/

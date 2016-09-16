@@ -35,6 +35,7 @@ class AliasName(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class AnalyzedEvent(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100, blank=True, default='')
@@ -42,6 +43,9 @@ class AnalyzedEvent(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    class Meta:
+        ordering = ('created',)
 
 
 class DecayType(models.Model):

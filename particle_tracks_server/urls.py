@@ -22,3 +22,9 @@ urlpatterns = [
     url(r'^', include('decays.urls')),
     url(r'^api-token-auth/', obtain_jwt_token),
 ]
+
+# the following is to allow login/logout from the browsable api
+urlpatterns += [
+    url(r'^api-auth/', include('rest_framework.urls',
+                               namespace='rest_framework')),
+]
