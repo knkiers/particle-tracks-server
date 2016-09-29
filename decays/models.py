@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 import math, random
+from jsonfield import JSONField
+import collections
 
 class Particle(models.Model):
     """
@@ -40,6 +42,7 @@ class AnalyzedEvent(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100, blank=True, default='')
     owner = models.ForeignKey('auth.User', related_name='analyzed_events')
+    event_data = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
     def __unicode__(self):
         return self.title
