@@ -117,6 +117,26 @@ def decay_type_list(request):
         serializer = DecayTypeSerializer(decay_types, many=True)
         return Response(serializer.data)
 
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
+def user_analyzed_events(request):
+    """
+    Gets all events for the currently authenticated user.
+    """
+    print request.user
+    analyzed_events_queryset = AnalyzedEvent.objects.all().filter(owner=request.user)
+    analyzed_events = []
+    for event in analyzed_events_queryset:
+        analyzed_events.append({
+            'created': event.created.isoformat(),
+            'title': event.title,
+            'id': event.id})
+
+    data_json = json.dumps(analyzed_events)
+
+    return Response(data_json)
+
+
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))

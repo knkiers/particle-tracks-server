@@ -13,7 +13,7 @@ class DecayTypeSerializer(serializers.ModelSerializer):
 
 # http://www.unknownerror.org/opensource/tomchristie/django-rest-framework/q/stackoverflow/16857450/how-to-register-users-in-django-rest-framework
 class UserSerializer(serializers.ModelSerializer):
-    analyzed_events = serializers.PrimaryKeyRelatedField(many=True, queryset=AnalyzedEvent.objects.all())
+    analyzed_events = serializers.PrimaryKeyRelatedField(many=True, allow_null=True, queryset=AnalyzedEvent.objects.all())
 
     class Meta:
         model = User
@@ -42,4 +42,4 @@ class AnalyzedEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AnalyzedEvent
-        fields = ('id', 'title', 'created', 'owner')
+        fields = ('id', 'title', 'created', 'owner', 'event_data')

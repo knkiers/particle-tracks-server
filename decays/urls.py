@@ -8,6 +8,7 @@ router.register(r'accounts', views.UserView, 'list')
 urlpatterns = [
     url(r'^api/decaytypelist/$', views.decay_type_list),
     url(r'^api/generateevent/$', views.generate_random_event),
+    url(r'^useranalyzedevents/$', views.user_analyzed_events),
     url(r'^analyzedevents/$', views.AnalyzedEventList.as_view()),
     url(r'^analyzedevents/(?P<pk>[0-9]+)/$', views.AnalyzedEventDetail.as_view()),
     url(r'^users/$', views.UserList.as_view()),
