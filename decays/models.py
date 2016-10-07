@@ -40,15 +40,16 @@ class AliasName(models.Model):
 
 class AnalyzedEvent(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    title = models.CharField(max_length=100, blank=True, default='')
+    title = models.CharField(max_length=200, blank=True, default='')
     owner = models.ForeignKey('auth.User', related_name='analyzed_events')
     event_data = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict})
+    submitted = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.title
 
     class Meta:
-        ordering = ('created',)
+        ordering = ('-created',)
 
 
 class DecayType(models.Model):
