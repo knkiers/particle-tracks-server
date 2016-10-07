@@ -91,10 +91,13 @@ class DecayType(models.Model):
                                            related_name = 'decay_types_d3d')
 
     name = models.CharField(max_length=200,
-                            help_text = "e.g., X-plus -> mu-plus + Y^0")
+                            help_text = "e.g., X<sup>0</sup> &rarr;  &pi;<sup>+</sup> + &pi;<sup>-</sup>, but written with sup and ampersands, etc.")
+    human_readable_name = models.CharField(max_length=200,
+                                           help_text = "e.g., X-plus -> mu-plus + Y^0")
+
 
     def __unicode__(self):
-        return '{0}'.format(self.name)
+        return '{0}'.format(self.human_readable_name)
 
     def is_two_body_decay(self):
         if self.daughter_three == None:
@@ -150,6 +153,7 @@ class DecayType(models.Model):
                          'xi_lab': xi_lab,
                          'theta_lab': theta_lab,
                          'name': self.name,
+                         'human_readable_name': self.human_readable_name,
                          'parent': {
                              'particle_id': self.parent.id,
                              'mass': m_a,
@@ -250,6 +254,7 @@ class DecayType(models.Model):
                          'xi_lab': xi_lab,
                          'theta_lab': theta_lab,
                          'name': self.name,
+                         'human_readable_name': self.human_readable_name,
                          'parent': {
                              'particle_id': self.parent.id,
                              'mass': m_a,

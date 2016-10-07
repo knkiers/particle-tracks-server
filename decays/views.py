@@ -130,7 +130,8 @@ def user_analyzed_events(request):
         analyzed_events.append({
             'created': event.created.isoformat(),
             'title': event.title,
-            'id': event.id})
+            'id': event.id,
+            'submitted': event.submitted})
 
     data_json = json.dumps(analyzed_events)
 
