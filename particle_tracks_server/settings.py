@@ -147,5 +147,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # jwt:
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=10800)
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=10)
 }

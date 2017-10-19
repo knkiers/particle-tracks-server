@@ -113,6 +113,22 @@ class DecayType(models.Model):
         and energies for the final state particles in the parent center of mass, then
         boosts by xi_lab and rotates by theta_lab.
         """
+
+        if self.parent_alias == None:
+            parent_alias = ''
+        else:
+            parent_alias = self.parent_alias.name
+
+        if self.daughter_one_alias == None:
+            daughter_one_alias = ''
+        else:
+            daughter_one_alias = self.daughter_one_alias.name
+
+        if self.daughter_two_alias == None:
+            daughter_two_alias = ''
+        else:
+            daughter_two_alias = self.daughter_two_alias.name
+
         if self.is_two_body_decay():
             costheta = -1+2*random.random()
             theta = math.acos(costheta)
@@ -156,6 +172,8 @@ class DecayType(models.Model):
                          'human_readable_name': self.human_readable_name,
                          'parent': {
                              'particle_id': self.parent.id,
+                             'particle_name': self.parent.name,
+                             'particle_alias': parent_alias,
                              'mass': m_a,
                              'charge': self.parent.charge,
                              'energy_momentum': coords_a
@@ -163,6 +181,8 @@ class DecayType(models.Model):
                          'decay_products': [
                              {
                                  'particle_id': self.daughter_one.id,
+                                 'particle_name': self.daughter_one.name,
+                                 'particle_alias': daughter_one_alias,
                                  'mass': m_b,
                                  'charge': self.daughter_one.charge,
                                  'energy_momentum': coords_b,
@@ -170,6 +190,8 @@ class DecayType(models.Model):
                              },
                              {
                                  'particle_id': self.daughter_two.id,
+                                 'particle_name': self.daughter_two.name,
+                                 'particle_alias': daughter_two_alias,
                                  'mass': m_c,
                                  'charge': self.daughter_two.charge,
                                  'energy_momentum': coords_c,
@@ -180,6 +202,13 @@ class DecayType(models.Model):
             return data_dict
 
         else:
+
+            if self.daughter_three_alias == None:
+                daughter_three_alias = ''
+            else:
+                daughter_three_alias = self.daughter_three_alias.name
+
+
             # in this case need to do an extra boost and rotation....
             costheta = -1+2*random.random()
             theta = math.acos(costheta)
@@ -257,6 +286,8 @@ class DecayType(models.Model):
                          'human_readable_name': self.human_readable_name,
                          'parent': {
                              'particle_id': self.parent.id,
+                             'particle_name': self.parent.name,
+                             'particle_alias': parent_alias,
                              'mass': m_a,
                              'charge': self.parent.charge,
                              'energy_momentum': coords_a
@@ -264,6 +295,8 @@ class DecayType(models.Model):
                          'decay_products': [
                              {
                                  'particle_id': self.daughter_one.id,
+                                 'particle_name': self.daughter_one.name,
+                                 'particle_alias': daughter_one_alias,
                                  'mass': m_b,
                                  'charge': self.daughter_one.charge,
                                  'energy_momentum': coords_b,
@@ -271,6 +304,8 @@ class DecayType(models.Model):
                              },
                              {
                                  'particle_id': self.daughter_two.id,
+                                 'particle_name': self.daughter_two.name,
+                                 'particle_alias': daughter_two_alias,
                                  'mass': m_c,
                                  'charge': self.daughter_two.charge,
                                  'energy_momentum': coords_c,
@@ -278,6 +313,8 @@ class DecayType(models.Model):
                              },
                              {
                                  'particle_id': self.daughter_three.id,
+                                 'particle_name': self.daughter_three.name,
+                                 'particle_alias': daughter_three_alias,
                                  'mass': m_d,
                                  'charge': self.daughter_three.charge,
                                  'energy_momentum': coords_d,

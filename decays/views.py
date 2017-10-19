@@ -127,9 +127,11 @@ def user_analyzed_events(request):
     analyzed_events_queryset = AnalyzedEvent.objects.all().filter(owner=request.user)
     analyzed_events = []
     for event in analyzed_events_queryset:
+        # https://code.tutsplus.com/tutorials/how-to-work-with-json-data-using-python--cms-25758
+        event_data = json.loads(event.event_data)
         analyzed_events.append({
             'created': event.created.isoformat(),
-            'title': event.title,
+            'title': event_data['event']['name'],
             'id': event.id,
             'submitted': event.submitted})
 
