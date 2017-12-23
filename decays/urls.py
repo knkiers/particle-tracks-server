@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^useranalyzedevents/$', views.user_analyzed_events),
     url(r'^analyzedevents/$', views.AnalyzedEventList.as_view()),
     url(r'^analyzedevents/(?P<pk>[0-9]+)/$', views.AnalyzedEventDetail.as_view()),
+    url(r'^institutions/$', views.InstitutionList.as_view()),
     url(r'^users/$', views.UserList.as_view()),
     url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view(),
     ),

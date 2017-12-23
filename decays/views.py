@@ -15,7 +15,7 @@ from django.utils.six import BytesIO
 
 from rest_framework import generics
 from django.contrib.auth.models import User
-from decays.serializers import UserSerializer, AnalyzedEventSerializer
+from decays.serializers import UserSerializer, AnalyzedEventSerializer, InstitutionSerializer
 
 from django.http import HttpResponse
 import json
@@ -98,7 +98,10 @@ class AnalyzedEventDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly,)
 
-
+class InstitutionList(generics.ListAPIView):
+    queryset = Institution.objects.all()
+    serializer_class = InstitutionSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 # to force authentication:

@@ -17,6 +17,10 @@ class Institution(models.Model):
     def __unicode__(self):
         return '{0}'.format(self.name)
 
+    class Meta:
+        ordering = ('name',)
+
+
 # A nice way to create a profile with a one-to-one link between the User and the User's other properties....nifty! 
 # https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html#onetoone
 # Also, see this post:
@@ -29,34 +33,34 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name = 'profile')
     institution = models.ForeignKey(Institution, related_name='profiles', blank = True, null = True)
     
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+#@receiver(post_save, sender=User)
+#def create_user_profile(sender, instance, created, **kwargs):
 # https://stackoverflow.com/questions/10299034/how-to-pass-kwargs-from-save-to-post-save-signal
 #https://stackoverflow.com/questions/12381756/django-calling-update-on-a-single-model-instance-retrieved-by-get
 # something is messed up here....
     
-    inst_id = getattr(instance, '_inst_id', None)
-    print 'id: ', inst_id
-    print 'created:', created
+#    inst_id = getattr(instance, '_inst_id', None)
+#    print 'id: ', inst_id
+#    print 'created:', created
 
-    if created and inst_id == None:
-        print 'creating profile, no institution'
-        Profile.objects.create(user=instance)
+#    if created and inst_id == None:
+#        print 'creating profile, no institution'
+#        Profile.objects.create(user=instance)
         
-    if created == False and (inst_id != None):
-        # profile already exists, but there is not yet an institution
-        institution = Institution.objects.get(pk=inst_id)
-        profile = instance.profile
-        setattr(profile, 'institution', institution)
-        profile.save()
+#    if created == False and (inst_id != None):
+#        # profile already exists, but there is not yet an institution
+#        institution = Institution.objects.get(pk=inst_id)
+#        profile = instance.profile
+#        setattr(profile, 'institution', institution)
+#        profile.save()
         
         #print 'creating profile with institution', institution.name
         # now should save the institution
         #Profile.objects.create(user=instance, institution=institution)
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+#@receiver(post_save, sender=User)
+#def save_user_profile(sender, instance, **kwargs):
+#    instance.profile.save()
     
 class Particle(models.Model):
     """
