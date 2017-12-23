@@ -13,8 +13,8 @@ urlpatterns = [
     url(r'^analyzedevents/(?P<pk>[0-9]+)/$', views.AnalyzedEventDetail.as_view()),
     url(r'^institutions/$', views.InstitutionList.as_view()),
     url(r'^users/$', views.UserList.as_view()),
-    url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view(),
-    ),
+    url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view()),
+    url(r'^usersthisinstitution/$', views.user_list_this_institution),
 ]
 
 urlpatterns += router.urls

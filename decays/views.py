@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 
 from rest_framework import permissions
 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from decays.permissions import IsOwnerOrReadOnly
 
 from decays.models import *
@@ -141,6 +141,42 @@ def user_analyzed_events(request):
     data_json = json.dumps(analyzed_events)
 
     return Response(data_json)
+
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, IsAdminUser, ))
+def user_list_this_institution(request):
+    """
+    Gets all the users for the institution to which the current user (who must be an admin) belongs
+    """
+    print request.user
+    # https://stackoverflow.com/questions/14537113/django-filter-items-with-onetoone-relationship-to-group-of-users
+    user_queryset = User.objects.all().filter(profile__institution=request.user.profile.institution)
+    users = []
+    for user in user_queryset:
+        # https://code.tutsplus.com/tutorials/how-to-work-with-json-data-using-python--cms-25758
+        number_events = AnalyzedEvent.objects.all().filter(owner=user).count()
+
+       
+ #fields = ('id', 'username','password', 'email', 'first_name', 'last_name', 'analyzed_events', 'institution_id', 'date_joined', 'is_staff')
+
+        
+        #event_data = json.loads(event.event_data)
+        users.append({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'number_events': number_events,
+            'institution_id': user.profile.institution.id,
+            'institution_name': user.profile.institution.name})
+
+    data_json = json.dumps(users)
+
+    return Response(data_json)
+
 
 
 
