@@ -121,7 +121,7 @@ def decay_type_list(request):
         return Response(serializer.data)
 
 @api_view(['GET'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes((IsAuthenticated, IsAdminUser ))
 def user_analyzed_events(request):
     """
     Gets all events for the currently authenticated user.
