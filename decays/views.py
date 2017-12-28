@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from decays.permissions import IsOwnerOrReadOnly
+from decays.permissions import IsOwnerOrReadOnly, IsLocalStaffOrOwner, IsLocalStaffOrOwnerTheseEvents
 
 from decays.models import *
 from decays.serializers import DecayTypeSerializer
@@ -64,14 +64,15 @@ def hello_world(request):
 #  json field.... https://github.com/bradjasper/django-jsonfield
 #
 
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
+# I believe that the following has now been deprecated and has been replaced by user_list_this_institution
+#class UserList(generics.ListAPIView):
+#    queryset = User.objects.all()
+#    serializer_class = UserSerializer
 
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated, IsLocalStaffOrOwner, )
 
 
 # WORKING HERE:
@@ -86,8 +87,8 @@ class UserDetail(generics.RetrieveAPIView):
 class AnalyzedEventList(generics.ListCreateAPIView):
     queryset = AnalyzedEvent.objects.all()
     serializer_class = AnalyzedEventSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsLocalStaffOrOwnerTheseEvents, )
+    
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
@@ -96,7 +97,7 @@ class AnalyzedEventDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = AnalyzedEvent.objects.all()
     serializer_class = AnalyzedEventSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly,)
+                          IsOwnerOrReadOnly, IsLocalStaffOrOwnerTheseEvents, )
 
 class InstitutionList(generics.ListAPIView):
     queryset = Institution.objects.all()

@@ -13,6 +13,7 @@ class DecayTypeSerializer(serializers.ModelSerializer):
 
 # http://www.unknownerror.org/opensource/tomchristie/django-rest-framework/q/stackoverflow/16857450/how-to-register-users-in-django-rest-framework
 class UserSerializer(serializers.ModelSerializer):
+    # analyzed_events ends up becoming a list of ids for the user's events
     analyzed_events = serializers.PrimaryKeyRelatedField(many=True, allow_null=True, queryset=AnalyzedEvent.objects.all())
     # maybe this: https://stackoverflow.com/questions/18517438/django-rest-framework-make-onetoone-relation-ship-feel-like-it-is-one-model
     institution_id = serializers.IntegerField(source='profile.institution.id', allow_null=True)
