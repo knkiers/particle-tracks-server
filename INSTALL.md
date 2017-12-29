@@ -43,8 +43,17 @@ sudo -u particle-tracks <command>
 By default `sudo` executes your command as the `root` user;
 the `-u` flag specifies a different user,
 under whose privileges the `<command>` is run.
+Authenticate using the password for your normal login account.
 
-## Log In
+For some commands
+(e.g., `nginx` configuration),
+you do want to run as `root`.
+In this case, use simply:
+```
+sudo <command>
+```
+
+## Shell
 
 If you are going to be running mulitple commands as the `particle-tracks` user,
 it can be simpler to start a login shell running at that user. Use:
@@ -60,3 +69,58 @@ it's important to include the `-u` flag.
 Note that there is no `<command>`
 given here;
 you are logging in so that you can issue multiple commands as the `particle-tracks` user.
+Authenticate using the password for your normal login account.
+
+# Clone Repositories
+
+Clone the two Particle Tracks repositories
+into the `particle-tracks` user's home directory.
+Because you'll issue several commands as `particle-tracks`,
+it will be easiest to `sudo` to a login shell.
+You should find yourself in the home directory
+of the `particle-tracks` account (e.g., `/home/particle-tracks`).
+
+Clone the client:
+```
+git clone https://github.com/knkiers/particle-tracks.git
+```
+and the server:
+```
+git clone https://github.com/knkiers/particle-tracks-server.git
+```
+
+# Create Virtual Environment
+
+The server runs under a Python virtual environment.
+Use a `particle-tracks` login shell.
+Run:
+```
+lsvirtualenv
+```
+to check whether there is already a virtual envionment set up.
+If not, create one with:
+```
+mkvirtualenv particle-tracks
+```
+If so, make sure you are using the `particle-tracks` environment;
+run:
+```
+workon particle-tracks
+```
+You can also check which virtual environment is current
+by running just
+```
+workon
+```
+
+# Install Python Modules
+
+Change directory to the `particle-tracks-server` directory,
+where the `requirements.txt` file is located.
+This file contains details of the Python modules
+needed by the Particle Tracks server.
+Install the required modules:
+```
+pip install -r requirements.txt
+```
+
