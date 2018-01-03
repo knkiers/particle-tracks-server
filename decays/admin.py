@@ -5,10 +5,13 @@ from decays.models import *
 class ParticleAdmin(admin.ModelAdmin):
     list_display = ('name', 'verbose_name', 'mass', 'charge')
 
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'institution')
+
 admin.site.register(Particle, ParticleAdmin)
 admin.site.register(AliasName)
 admin.site.register(DecayType)
 admin.site.register(AnalyzedEvent)
 admin.site.register(Institution)
-admin.site.register(Profile)
+admin.site.register(Profile, ProfileAdmin)
 

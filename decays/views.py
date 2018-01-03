@@ -187,6 +187,9 @@ def generate_random_event(request):
     """
     Generate a random event.  b_field should be a number (strength of the B field in kG);
     b_direction should be either 'in' or 'out'.
+    NOTE: At this point, b_field and b_direction are not being used; rather,
+          an event is being generated, and the client-side code is determining
+          everything having to do with the B field.
     """
 
     # helpful page: http://stackoverflow.com/questions/150505/capturing-url-parameters-in-request-get
@@ -196,8 +199,8 @@ def generate_random_event(request):
 
     # print request.GET
 
-    print b_field # probably a string at this point....
-    print b_direction
+    print 'B field: ', b_field # probably a string at this point....
+    print 'B direction: ', b_direction
 
     xi_min = 0.05
     xi_max = 0.3
