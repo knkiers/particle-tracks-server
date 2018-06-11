@@ -202,10 +202,6 @@ def generate_random_event(request):
     print 'B field: ', b_field # probably a string at this point....
     print 'B direction: ', b_direction
 
-    xi_min = 0.05
-    xi_max = 0.3
-    xi_lab = random.random()*(xi_max-xi_min)+xi_min
-
     theta_min = 0.25
     theta_max = 0.85
     theta_lab = random.random()*(theta_max-theta_min)+theta_min
@@ -221,6 +217,27 @@ def generate_random_event(request):
     pk = random.choice(id_list)
 
     decay_type = DecayType.objects.get(pk=pk)
+
+    parent_mass = decay_type.parent.mass
+
+    print "parent_mass: ", parent_mass
+
+    # reduce xi_max for heavier initial particles....
+    xi_max_initial_calc = 0.3-0.25*parent_mass/1900
+
+    xi_min = 0.05
+
+    if xi_max_initial_calc > xi_min:
+        xi_max = min(0.3,xi_max_initial_calc)
+    else:
+        xi_max = xi_min
+
+    print "xi_max: ", xi_max
+
+    xi_lab = random.random()*(xi_max-xi_min)+xi_min
+
+    print "xi_lab: ", xi_lab
+
     data = decay_type.rand_momentum_config_parent_cm(xi_lab, theta_lab)
 
     # if this is a two-step decay, will need to get the "data" in two steps...not too bad, though!
