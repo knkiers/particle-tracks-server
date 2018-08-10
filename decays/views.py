@@ -14,6 +14,9 @@ from rest_framework.parsers import JSONParser
 from django.utils.six import BytesIO
 
 from rest_framework import generics
+from rest_framework_jwt.settings import api_settings
+
+
 from django.contrib.auth.models import User
 from decays.serializers import UserSerializer, AnalyzedEventSerializer, InstitutionSerializer
 
@@ -24,8 +27,9 @@ import random
 
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
+from rest_framework import status
 
-from .permissions import IsStaffOrTargetUser
+from .permissions import IsStaffOrTargetUser, IsLocalStaffOrTargetUser
 
 # ISSUES(?):
 # - at this point, when a new user is created, a hashed version of the new user's
@@ -39,12 +43,57 @@ from .permissions import IsStaffOrTargetUser
 class UserView(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     #model = User
-    queryset = User.objects.all()
+    #queryset = User.objects.all()
+
+    # http://masnun.rocks/2017/03/27/django-rest-framework-using-request-object/
+    def get_queryset(self):
+            queryset = User.objects.all().filter(profile__institution=self.request.user.profile.institution)
+            return queryset
 
     def get_permissions(self):
         # allow non-authenticated user to create via POST
-        return (AllowAny() if self.request.method == 'POST'
-                else IsStaffOrTargetUser()),
+        if self.request.method == 'POST':
+            return (AllowAny()),
+        elif self.request.method == 'GET':
+            return (IsLocalStaffOrTargetUser()),
+        else:
+            return (IsLocalStaffOrOwner()),
+
+
+            # try IsLocalStaffOrOwner....(?)maybe let this only be for the user
+
+
+        #elif self.request.method == 'PUT':
+        #    return (IsStaffOrTargetUserUpdateOnly()),
+
+        #return (AllowAny() if self.request.method == 'POST'
+        #        else IsStaffOrTargetUser()),
+
+    # https://thinkster.io/tutorials/django-json-api/authentication
+    def update(self, request, *args, **kwargs):
+
+        serializer_data = request.data
+
+        # Here is that serialize, validate, save pattern we talked about
+        # before.
+        serializer = self.serializer_class(
+            request.user, data=serializer_data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+
+        # Generate a new token
+        # http://getblimp.github.io/django-rest-framework-jwt/#refresh-token
+        # https://stackoverflow.com/questions/44820130/how-to-handle-token-when-update-username-field-with-django-rest-framework
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+        payload = jwt_payload_handler(instance)
+        token = jwt_encode_handler(payload)
+
+        return Response({'token': token.decode('unicode_escape')}, status=status.HTTP_200_OK)
+
+# WORKING HERE....password reset: https://github.com/anx-ckreuzberger/django-rest-passwordreset
 
 
 @api_view()

@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('decays.urls')),
     url(r'^api-token-auth/', obtain_jwt_token),
+    url(r'^api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
 ]
 
 # the following is to allow login/logout from the browsable api

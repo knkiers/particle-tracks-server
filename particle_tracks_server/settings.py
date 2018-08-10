@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'decays.apps.DecaysConfig',
     'corsheaders',
+    'django_rest_passwordreset',
 ]
 
 MIDDLEWARE = [
@@ -63,7 +64,7 @@ ROOT_URLCONF = 'particle_tracks_server.urls'
 # https://pypi.python.org/pypi/django-cors-middleware/1.3.1
 # https://github.com/ottoyiu/django-cors-headers/issues/102
 # need to refine this at some point...!
-# CORS_ORIGIN_ALLOW_ALL = True
+#CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -80,7 +81,7 @@ REST_FRAMEWORK = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['decays/email/'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -152,3 +153,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=10)
 }
+
+# email:
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
