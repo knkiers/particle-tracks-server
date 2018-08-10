@@ -86,7 +86,7 @@ def password_reset_token_created(sender, reset_password_token, *args, **kwargs):
             'current_user': reset_password_token.user,
             'username': reset_password_token.user.username,
             'email': reset_password_token.user.email,
-            'reset_password_url': "http://localhost:4200/reset-password-confirm/?token={token}".format(token=reset_password_token.key)
+            'reset_password_url': "https://particle-tracks.physics.taylor.edu/reset-password-confirm/?token={token}".format(token=reset_password_token.key) #"http://localhost:4200/reset-password-confirm/?token={token}".format(token=reset_password_token.key)
             }
 
     # render email text
