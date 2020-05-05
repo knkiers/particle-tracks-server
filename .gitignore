@@ -3,3 +3,4 @@
 *.db
 static/
 secret.py
+venv/

@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import datetime
-from secret import SECRET_KEY
+from .secret import SECRET_KEY
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -64,7 +64,7 @@ ROOT_URLCONF = 'particle_tracks_server.urls'
 # https://pypi.python.org/pypi/django-cors-middleware/1.3.1
 # https://github.com/ottoyiu/django-cors-headers/issues/102
 # need to refine this at some point...!
-#CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
