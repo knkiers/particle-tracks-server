@@ -176,7 +176,7 @@ def user_analyzed_events(request):
     """
     Gets all events for the currently authenticated user.
     """
-    print request.user
+    print(request.user)
     analyzed_events_queryset = AnalyzedEvent.objects.all().filter(owner=request.user)
     analyzed_events = []
     for event in analyzed_events_queryset:
@@ -200,7 +200,7 @@ def user_list_this_institution(request):
     """
     Gets all the users for the institution to which the current user (who must be an admin) belongs
     """
-    print request.user
+    print(request.user)
     # https://stackoverflow.com/questions/14537113/django-filter-items-with-onetoone-relationship-to-group-of-users
     user_queryset = User.objects.all().filter(profile__institution=request.user.profile.institution)
     users = []
@@ -248,8 +248,8 @@ def generate_random_event(request):
 
     # print request.GET
 
-    print 'B field: ', b_field # probably a string at this point....
-    print 'B direction: ', b_direction
+    print('B field: ', b_field) # probably a string at this point....
+    print('B direction: ', b_direction)
 
     theta_min = 0.25
     theta_max = 0.85
@@ -269,7 +269,7 @@ def generate_random_event(request):
 
     parent_mass = decay_type.parent.mass
 
-    print "parent_mass: ", parent_mass
+    print("parent_mass: ", parent_mass)
 
     # reduce xi_max for heavier initial particles....
     xi_max_initial_calc = 0.3-0.25*parent_mass/1900
@@ -281,11 +281,11 @@ def generate_random_event(request):
     else:
         xi_max = xi_min
 
-    print "xi_max: ", xi_max
+    print("xi_max: ", xi_max)
 
     xi_lab = random.random()*(xi_max-xi_min)+xi_min
 
-    print "xi_lab: ", xi_lab
+    print("xi_lab: ", xi_lab)
 
     data = decay_type.rand_momentum_config_parent_cm(xi_lab, theta_lab)
 
@@ -293,7 +293,7 @@ def generate_random_event(request):
 
     data_json = json.dumps(data)
 
-    print data_json
+    print(data_json)
 
     context = {'data': data}
 

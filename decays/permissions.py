@@ -62,7 +62,7 @@ class IsLocalStaffOrOwnerTheseEvents(permissions.BasePermission):
     allow logged in user to view own events, allows staff for a given institution to view all user events for that institution
     """
     def has_object_permission(self, request, view, obj):
-        print obj
+        #print(obj)
         return (request.user.is_staff and (request.user.profile.institution == obj.owner.profile.institution)) or obj.owner == request.user
 
     

@@ -81,12 +81,12 @@ def password_reset_token_created(sender, reset_password_token, *args, **kwargs):
     """
     # send an e-mail to the user
 
-    print "receiver received the signal!"
+    print("receiver received the signal!")
     context = {
             'current_user': reset_password_token.user,
             'username': reset_password_token.user.username,
             'email': reset_password_token.user.email,
-            'reset_password_url': "https://particle-tracks.physics.taylor.edu/reset-password-confirm/?token={token}".format(token=reset_password_token.key) #"http://localhost:4200/reset-password-confirm/?token={token}".format(token=reset_password_token.key)
+            'reset_password_url': "https://particle-tracks.physics.taylor.edu/reset-password-confirm/?token={token}".format(token=reset_password_token.key)
             }
 
     # render email text
@@ -271,11 +271,11 @@ class DecayType(models.Model):
             coords_c = boost_then_rotate(xi_lab, theta_lab,
                                          boost_then_rotate(0, theta, coords_c))
 
-            print coords_a
-            print coords_b
-            print coords_c
+            print(coords_a)
+            print(coords_b)
+            print(coords_c)
 
-            print [coords_b[0]+coords_c[0],coords_b[1]+coords_c[1],coords_b[2]+coords_c[2]]
+            print([coords_b[0]+coords_c[0],coords_b[1]+coords_c[1],coords_b[2]+coords_c[2]])
 
             # Note: if one of the decay products itself decays, then 'decay_dict" will be replaced
             #       by its own complete data_dict(!)

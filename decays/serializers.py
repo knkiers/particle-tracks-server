@@ -32,9 +32,9 @@ class UserSerializer(serializers.ModelSerializer):
         # I don't quite see how this works; the client only sends over an institution_id, but the validated_data object includes
         # a profile object with an institution object that has an id.  Somehow the institution_id line above must set things
         # up so that there is an entire profile object...?
-        print 'validated data: ', validated_data
+        print('validated data: ', validated_data)
         inst_id = validated_data["profile"]["institution"]["id"]
-        print 'institution id: ', inst_id
+        print('institution id: ', inst_id)
 
         
         user = User.objects.create(
@@ -60,8 +60,8 @@ class UserSerializer(serializers.ModelSerializer):
         # - generate password reset email: https://www.youtube.com/watch?v=VLOM-mZCfpk
         # - next part: https://www.youtube.com/watch?v=K-qHzxrNtoI
 
-        print 'instance: ', instance
-        print 'validated data: ', validated_data
+        print('instance: ', instance)
+        print('validated data: ', validated_data)
 
         # https://thinkster.io/tutorials/django-json-api/authentication
         password = validated_data.pop('password', None)
@@ -83,7 +83,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         if profile is not None:
             inst_id = profile['institution']['id']
-            print 'updating institution: ', inst_id
+            print('updating institution: ', inst_id)
             self.update_or_create_profile(instance, inst_id)
 
         return instance
