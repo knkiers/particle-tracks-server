@@ -11,7 +11,7 @@ from decays.models import *
 from decays.serializers import DecayTypeSerializer
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from django.utils.six import BytesIO
+#from django.utils.six import BytesIO
 
 from rest_framework import generics
 from rest_framework_jwt.settings import api_settings
