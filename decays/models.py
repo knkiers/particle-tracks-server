@@ -36,7 +36,7 @@ class Profile(models.Model):
     one-to-one correspondence with the User class
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name = 'profile')
-    institution = models.ForeignKey(Institution, related_name='profiles', blank = True, null = True)
+    institution = models.ForeignKey(Institution, related_name='profiles', blank = True, null = True, on_delete=models.CASCADE)
     
 #@receiver(post_save, sender=User)
 #def create_user_profile(sender, instance, created, **kwargs):
@@ -155,7 +155,7 @@ class AliasName(models.Model):
 class AnalyzedEvent(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=200, blank=True, default='')
-    owner = models.ForeignKey('auth.User', related_name='analyzed_events')
+    owner = models.ForeignKey('auth.User', related_name='analyzed_events', on_delete=models.CASCADE)
     event_data = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict})
     submitted = models.BooleanField(default=False)
 
@@ -176,33 +176,33 @@ class DecayType(models.Model):
     Probably should have abstracted out DecayProduct, or something, and had a many-to-many
     relation to it...!  Ah well.
     """
-    parent = models.ForeignKey(Particle, related_name = 'decay_types')
+    parent = models.ForeignKey(Particle, related_name = 'decay_types', on_delete=models.CASCADE)
     # if parent_alias is blank, then there is no alias and the type of
     # parent particle is NOT hidden from the user
-    parent_alias = models.ForeignKey(AliasName, blank = True, null = True)
+    parent_alias = models.ForeignKey(AliasName, blank = True, null = True, on_delete=models.CASCADE)
 
-    daughter_one = models.ForeignKey(Particle, related_name = 'decay_types_d1')
+    daughter_one = models.ForeignKey(Particle, related_name = 'decay_types_d1', on_delete=models.CASCADE)
     daughter_one_alias = models.ForeignKey(AliasName,
                                            blank = True, null = True,
-                                           related_name = 'decay_types_d1a')
+                                           related_name = 'decay_types_d1a', on_delete=models.CASCADE)
     daughter_one_decay = models.ForeignKey('DecayType', blank = True, null = True,
-                                           related_name = 'decay_types_d1d')
+                                           related_name = 'decay_types_d1d', on_delete=models.CASCADE)
 
-    daughter_two = models.ForeignKey(Particle, related_name = 'decay_types_d2')
+    daughter_two = models.ForeignKey(Particle, related_name = 'decay_types_d2', on_delete=models.CASCADE)
     daughter_two_alias = models.ForeignKey(AliasName,
                                            blank = True, null = True,
-                                           related_name = 'decay_types_d2a')
+                                           related_name = 'decay_types_d2a', on_delete=models.CASCADE)
     daughter_two_decay = models.ForeignKey('DecayType', blank = True, null = True,
-                                           related_name = 'decay_types_d2d')
+                                           related_name = 'decay_types_d2d', on_delete=models.CASCADE)
 
     # the third decay particle is optional
     daughter_three = models.ForeignKey(Particle, related_name = 'decay_types_d3',
-                                       blank = True, null = True)
+                                       blank = True, null = True, on_delete=models.CASCADE)
     daughter_three_alias = models.ForeignKey(AliasName,
                                              blank = True, null = True,
-                                           related_name = 'decay_types_d3a')
+                                           related_name = 'decay_types_d3a', on_delete=models.CASCADE)
     daughter_three_decay = models.ForeignKey('DecayType', blank = True, null = True,
-                                           related_name = 'decay_types_d3d')
+                                           related_name = 'decay_types_d3d', on_delete=models.CASCADE)
 
     name = models.CharField(max_length=200,
                             help_text = "e.g., X<sup>0</sup> &rarr;  &pi;<sup>+</sup> + &pi;<sup>-</sup>, but written with sup and ampersands, etc.")
