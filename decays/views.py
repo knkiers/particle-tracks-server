@@ -91,7 +91,9 @@ class UserView(viewsets.ModelViewSet):
         payload = jwt_payload_handler(instance)
         token = jwt_encode_handler(payload)
 
-        return Response({'token': token.decode('unicode_escape')}, status=status.HTTP_200_OK)
+        #return Response({'token': token.decode('unicode_escape')}, status=status.HTTP_200_OK)
+        return Response({'token': token}, status=status.HTTP_200_OK)
+
 
 # WORKING HERE....password reset: https://github.com/anx-ckreuzberger/django-rest-passwordreset
 
@@ -184,13 +186,13 @@ def user_analyzed_events(request):
         event_data = json.loads(event.event_data)
         analyzed_events.append({
             'created': event.created.isoformat(),
+            'uuid': event_data['event']['uuid'],
             'title': event_data['event']['name'],
             'id': event.id,
             'submitted': event.submitted})
-
-    data_json = json.dumps(analyzed_events)
-
-    return Response(data_json)
+    #data_json = json.dumps(analyzed_events)
+    #print(analyzed_events)
+    return Response(analyzed_events)
 
 
 
@@ -223,9 +225,9 @@ def user_list_this_institution(request):
             'institution_id': user.profile.institution.id,
             'institution_name': user.profile.institution.name})
 
-    data_json = json.dumps(users)
+    #data_json = json.dumps(users)
 
-    return Response(data_json)
+    return Response(users)
 
 
 
@@ -291,13 +293,14 @@ def generate_random_event(request):
 
     # if this is a two-step decay, will need to get the "data" in two steps...not too bad, though!
 
-    data_json = json.dumps(data)
+    #data_json = json.dumps(data)
+    print(data)
+    #print(data_json)
 
-    print(data_json)
+    #context = {'data': data}
 
-    context = {'data': data}
-
-    return Response(data_json)
+    #return Response(data_json)
+    return Response(data)
 
 #
 # MAKE SURE the user is logged in first...?  maybe don't need to do that for simple get requests like this....

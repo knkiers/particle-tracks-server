@@ -13,6 +13,8 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.core.mail import send_mail
 
+import uuid
+
 class Institution(models.Model):
     """
     The institution to which a User belongs.
@@ -90,7 +92,7 @@ def password_reset_token_created(sender, reset_password_token, *args, **kwargs):
             }
 
     # render email text
-    email_html_message = render_to_string('user_reset_password.html', context)
+    #email_html_message = render_to_string('user_reset_password.html', context)
     email_plaintext_message = render_to_string('user_reset_password.txt', context)
 
     #print email_html_message
@@ -243,6 +245,8 @@ class DecayType(models.Model):
         else:
             daughter_two_alias = self.daughter_two_alias.name
 
+        uuid_str = str(uuid.uuid4().int)
+
         if self.is_two_body_decay():
             costheta = -1+2*random.random()
             theta = math.acos(costheta)
@@ -279,7 +283,8 @@ class DecayType(models.Model):
 
             # Note: if one of the decay products itself decays, then 'decay_dict" will be replaced
             #       by its own complete data_dict(!)
-            data_dict = {'is_two_body_decay': True,
+            data_dict = {'uuid': uuid_str,
+                         'is_two_body_decay': True,
                          'xi_lab': xi_lab,
                          'theta_lab': theta_lab,
                          'name': self.name,
@@ -393,7 +398,8 @@ class DecayType(models.Model):
 #            print [coords_b[0]+coords_c[0]+coords_d[0],coords_b[1]+coords_c[1]+coords_d[1],
 #                   coords_b[2]+coords_c[2]+coords_d[2]]
 
-            data_dict = {'is_two_body_decay': False,
+            data_dict = {'uuid': uuid_str,
+                         'is_two_body_decay': False,
                          'xi_lab': xi_lab,
                          'theta_lab': theta_lab,
                          'name': self.name,
