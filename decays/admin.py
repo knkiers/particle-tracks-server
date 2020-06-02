@@ -8,10 +8,13 @@ class ParticleAdmin(admin.ModelAdmin):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'institution')
 
+class AnalyzedEventAdmin(admin.ModelAdmin):
+    list_display = ('title', 'submitted', 'created', 'updated')
+
 admin.site.register(Particle, ParticleAdmin)
 admin.site.register(AliasName)
 admin.site.register(DecayType)
-admin.site.register(AnalyzedEvent)
+admin.site.register(AnalyzedEvent, AnalyzedEventAdmin)
 admin.site.register(Institution)
 admin.site.register(Profile, ProfileAdmin)
 

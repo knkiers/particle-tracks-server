@@ -113,7 +113,7 @@ class AnalyzedEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AnalyzedEvent
-        fields = ('id', 'title', 'created', 'owner', 'event_data', 'submitted')
+        fields = ('id', 'title', 'created', 'updated', 'owner', 'event_data', 'submitted')
 
 
 class InstitutionSerializer(serializers.ModelSerializer):

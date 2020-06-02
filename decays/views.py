@@ -185,6 +185,7 @@ def user_analyzed_events(request):
         # https://code.tutsplus.com/tutorials/how-to-work-with-json-data-using-python--cms-25758
         event_data = json.loads(event.event_data)
         analyzed_events.append({
+            'updated': event.updated.isoformat(),
             'created': event.created.isoformat(),
             'uuid': event_data['event']['uuid'],
             'title': event_data['event']['name'],
