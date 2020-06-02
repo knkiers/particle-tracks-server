@@ -187,7 +187,6 @@ def user_analyzed_events(request):
         analyzed_events.append({
             'updated': event.updated.isoformat(),
             'created': event.created.isoformat(),
-            'uuid': event_data['event']['uuid'],
             'title': event_data['event']['name'],
             'id': event.id,
             'submitted': event.submitted})
