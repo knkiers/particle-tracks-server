@@ -209,6 +209,14 @@ def user_list_this_institution(request):
     for user in user_queryset:
         # https://code.tutsplus.com/tutorials/how-to-work-with-json-data-using-python--cms-25758
         number_events = AnalyzedEvent.objects.all().filter(owner=user).count()
+        # https://stackoverflow.com/questions/9834038/django-order-by-query-set-ascending-and-descending
+        dates = [event.updated for event in AnalyzedEvent.objects.all().filter(owner=user).order_by('-updated')]
+        if len(dates) > 0:
+            latest_activity = dates[0]
+        else:
+            latest_activity = user.date_joined
+        #print(user, "  ", latest_activity)
+        #print(dates)
 
        
  #fields = ('id', 'username','password', 'email', 'first_name', 'last_name', 'analyzed_events', 'institution_id', 'date_joined', 'is_staff')
@@ -219,6 +227,7 @@ def user_list_this_institution(request):
             'id': user.id,
             'username': user.username,
             'email': user.email,
+            'latest_activity': latest_activity,
             'first_name': user.first_name,
             'last_name': user.last_name,
             'number_events': number_events,
@@ -227,7 +236,9 @@ def user_list_this_institution(request):
 
     #data_json = json.dumps(users)
 
-    return Response(users)
+    return Response({
+        'users': users,
+        'institution': request.user.profile.institution.name})
 
 
 

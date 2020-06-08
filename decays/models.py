@@ -163,8 +163,11 @@ class AnalyzedEvent(models.Model):
     def __unicode__(self):
         return self.title
 
+    # https://stackoverflow.com/questions/36564694/django-order-by-multiple-fields
+    # https://docs.djangoproject.com/en/3.0/ref/models/options/
+    # https://stackoverflow.com/questions/55364691/django-order-a-queryset-based-on-a-boolean-field
     class Meta:
-        ordering = ('-created',)
+        ordering = ['-submitted', '-updated']
 
 
 class DecayType(models.Model):
