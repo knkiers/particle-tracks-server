@@ -19,7 +19,7 @@ class Institution(models.Model):
     """
     name = models.CharField(max_length=60, help_text = "e.g., Taylor University")
 
-    def __unicode__(self):
+    def __str__(self):
         return '{0}'.format(self.name)
 
     class Meta:
@@ -138,7 +138,7 @@ class Particle(models.Model):
     mass = models.FloatField(help_text = "mass in MeV/c^2")
     charge = models.IntegerField(choices = CHARGE_CHOICES)
 
-    def __unicode__(self):
+    def __str__(self):
         return '{0}'.format(self.verbose_name)
 
 
@@ -147,9 +147,10 @@ class AliasName(models.Model):
     Names of particle aliases, such as X^+, Y^0, etc.
     """
     name = models.CharField(max_length = 40, help_text = "e.g., X^+")
+    verbose_name = models.CharField(max_length = 40, blank=True, default='', help_text = "e.g., X-plus")
 
-    def __unicode__(self):
-        return self.name
+    def __str__(self):
+        return '{0}'.format(self.verbose_name)
 
 
 class AnalyzedEvent(models.Model):
@@ -160,7 +161,7 @@ class AnalyzedEvent(models.Model):
     event_data = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict})
     submitted = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     # https://stackoverflow.com/questions/36564694/django-order-by-multiple-fields
@@ -208,13 +209,7 @@ class DecayType(models.Model):
     daughter_three_decay = models.ForeignKey('DecayType', blank = True, null = True,
                                            related_name = 'decay_types_d3d', on_delete=models.CASCADE)
 
-    name = models.CharField(max_length=200,
-                            help_text = "e.g., X<sup>0</sup> &rarr;  &pi;<sup>+</sup> + &pi;<sup>-</sup>, but written with sup and ampersands, etc.")
-    human_readable_name = models.CharField(max_length=200,
-                                           help_text = "e.g., X-plus -> mu-plus + Y^0")
-
-
-    def __unicode__(self):
+    def __str__(self):
         return '{0}'.format(self.human_readable_name)
 
     def is_two_body_decay(self):
@@ -223,7 +218,44 @@ class DecayType(models.Model):
         else:
             return False
 
+    @property
+    def name(self):
+        # https://stackoverflow.com/questions/11880430/how-to-write-inline-if-statement-for-print
+        decay_string = (self.parent.name if self.parent_alias == None else self.parent_alias.name) + ' &rarr; '
+        daughter_string_list = []
+        daughter_string_list.append(self.daughter_one.name if self.daughter_one_alias == None else self.daughter_one_alias.name)
+        daughter_string_list.append(self.daughter_two.name if self.daughter_two_alias == None else self.daughter_two_alias.name)
+        if not self.is_two_body_decay():
+            daughter_string_list.append(self.daughter_three.name if self.daughter_three_alias == None else self.daughter_three_alias.name)
 
+        for ii, elem in enumerate(daughter_string_list, start=0):
+            decay_string += elem if ii == 0 else ' + ' + elem
+        
+        return decay_string
+
+    @property
+    def human_readable_name(self):
+        decay_string = (self.parent.verbose_name if self.parent_alias == None else self.parent_alias.verbose_name) + ' -> '
+        daughter_string_list = []
+        daughter_string_list.append(self.daughter_one.verbose_name if self.daughter_one_alias == None else self.daughter_one_alias.verbose_name)
+        daughter_string_list.append(self.daughter_two.verbose_name if self.daughter_two_alias == None else self.daughter_two_alias.verbose_name)
+        if not self.is_two_body_decay():
+            daughter_string_list.append(self.daughter_three.verbose_name if self.daughter_three_alias == None else self.daughter_three_alias.verbose_name)
+
+        for ii, elem in enumerate(daughter_string_list, start=0):
+            decay_string += elem if ii == 0 else ' + ' + elem
+        
+        return decay_string
+
+
+    @property
+    def name_without_aliases(self):
+        decay_string = self.parent.name + ' &rarr; '
+        if self.is_two_body_decay():
+            decay_string = decay_string + self.daughter_one.name + ' + ' + self.daughter_two.name
+        else:
+            decay_string = decay_string + self.daughter_one.name + ' + ' + self.daughter_two.name + ' + ' + self.daughter_three.name
+        return decay_string
 
     def rand_momentum_config_parent_cm(self, xi_lab, theta_lab):
         """

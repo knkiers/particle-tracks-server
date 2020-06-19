@@ -241,10 +241,236 @@ def user_list_this_institution(request):
         'institution': request.user.profile.institution.name})
 
 
-
-
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
+def events_with_same_signature(request, id):
+    """
+    Returns a list of events that have the same event signature as the one
+    whose id is in the request.
+    """
+
+    print('id: ', id)
+
+    target_decay = DecayType.objects.get(pk=id)
+
+    print('decay type: ', target_decay)
+    print(target_decay.parent)
+    print(target_decay.daughter_one)
+    print(target_decay.daughter_two)
+    print(target_decay.daughter_three)
+
+    all_decays = DecayType.objects.all()
+
+    # number of particles in final state agree and the decay in question is not the target decay itself
+    decays_same_signature_first_pass = [dt for dt in all_decays if ((dt.is_two_body_decay() == target_decay.is_two_body_decay()) and (dt.id != target_decay.id))]
+
+    print(decays_same_signature_first_pass)
+
+    if target_decay.parent_alias == None:
+        # parent's identity is known
+        print('parent identity is known; must be an exact match')
+        decays_same_signature_second_pass = [dt for dt in decays_same_signature_first_pass if dt.parent == target_decay.parent]
+    else:
+        print('parent identity is not know; only the charge needs to match')
+        decays_same_signature_second_pass = [dt for dt in decays_same_signature_first_pass if dt.parent.charge == target_decay.parent.charge]
+
+    print(decays_same_signature_second_pass)
+    
+    for dt in decays_same_signature_second_pass:
+        print(dt.id, " ", dt.parent, " ", dt.daughter_one, " ", dt.daughter_two, " ", dt.daughter_three)
+
+    # at this point, the parents match....
+    matching_decays = []
+    for dt in decays_same_signature_second_pass:
+        print('candidate decay id: ', dt.id)
+        dt_list = [
+            {
+                'id': dt.daughter_one.id,
+                'charge': dt.daughter_one.charge
+            },
+            {
+                'id': dt.daughter_two.id,
+                'charge': dt.daughter_two.charge
+            },
+        ]
+        if dt.daughter_three != None:
+            dt_list.append({
+                'id': dt.daughter_three.id,
+                'charge': dt.daughter_three.charge
+            })
+        
+        # need to go through the list of daughter particles twice....first only do the "known" ones, then do the not-known ones;
+        # the reason is that if we have a not-known one, we could accidentally pop an exact match out of the list and lead to a false negative
+
+        decay_type_matches = True
+
+        # first do the ones that do not have aliases, then go through again and do the ones that do have aliases...kind of painful....
+        if decay_type_matches and (target_decay.daughter_one_alias == None):
+            print('daughter one is known')
+            result = pop_matching_decays(True, target_decay.daughter_one, dt_list)
+            dt_list = result['remaining_particles']
+            if not result['dt_matches']:
+                decay_type_matches = False
+        
+        if decay_type_matches and (target_decay.daughter_two_alias == None):
+            print('daughter two is known')
+            result = pop_matching_decays(True, target_decay.daughter_two, dt_list)
+            dt_list = result['remaining_particles']
+            if not result['dt_matches']:
+                decay_type_matches = False
+
+        if (not target_decay.is_two_body_decay()) and decay_type_matches and (target_decay.daughter_three_alias == None):
+            print('daughter three is known')
+            result = pop_matching_decays(True, target_decay.daughter_three, dt_list)
+            dt_list = result['remaining_particles']
+            if not result['dt_matches']:
+                decay_type_matches = False
+
+        # now do the cases for which the particles have aliases....
+        if decay_type_matches and (target_decay.daughter_one_alias != None):
+            print('daughter one has an alias')
+            result = pop_matching_decays(False, target_decay.daughter_one, dt_list)
+            dt_list = result['remaining_particles']
+            if not result['dt_matches']:
+                decay_type_matches = False
+        
+        if decay_type_matches and (target_decay.daughter_two_alias != None):
+            print('daughter two has an alias')
+            result = pop_matching_decays(False, target_decay.daughter_two, dt_list)
+            dt_list = result['remaining_particles']
+            if not result['dt_matches']:
+                decay_type_matches = False
+
+        if (not target_decay.is_two_body_decay()) and decay_type_matches and (target_decay.daughter_three_alias != None):
+            print('daughter three has an alias')
+            result = pop_matching_decays(False, target_decay.daughter_three, dt_list)
+            dt_list = result['remaining_particles']
+            if not result['dt_matches']:
+                decay_type_matches = False
+
+        if decay_type_matches:
+            print('>>> we have a total match!!!!')
+            if target_decay.is_two_body_decay():
+                matching_decays.append({
+                    'decay_id': dt.id,
+                    'parent_id': dt.parent.id,
+                    'daughter_ids': [dt.daughter_one.id, dt.daughter_two.id]
+                })
+            else:
+                matching_decays.append({
+                    'decay_id': dt.id,
+                    'parent_id': dt.parent.id,
+                    'daughter_ids': [dt.daughter_one.id, dt.daughter_two.id, dt.daughter_three.id]
+                })
+
+    # Now need to reduce the list down to only the truly different types of decays.  So far we have decay types that might
+    # actually represent the same decays, but have different particles that have aliases.
+    
+    # cycle through the list and check elements further down the list for matches.  If one of them is a match, add it
+    # to a list of elements that will be removed, but don't pop it yet (or else might mess up the list that we're iterating
+    # through).  Then go through the list and collect only those elements that remain.
+
+    element_indices_to_be_deleted = []
+
+    for ii, elem in enumerate(matching_decays, start = 0):
+        for jj in range(ii+1,len(matching_decays)):
+            print('ii, jj = ', ii,' ', jj)
+            #print(elem[ii])
+            #print(elem[jj]['parent_id'])
+            #print(elem[ii]['daughter_ids'])
+            #print(elem[jj]['daughter_ids'])
+            if (elem['parent_id'] == matching_decays[jj]['parent_id']) and list_elements_match_exactly(elem['daughter_ids'], matching_decays[jj]['daughter_ids']):
+                print('>>> need to delete this element!')
+                element_indices_to_be_deleted.append(jj)
+
+    final_matching_decays = []
+    # https://treyhunner.com/2016/04/how-to-loop-with-indexes-in-python/
+    for ii, elem in enumerate(matching_decays, start = 0):
+        # https://thispointer.com/python-how-to-check-if-an-item-exists-in-list-search-by-value-or-condition/#:~:text=Check%20if%20element%20exist%20in%20list%20using%20list.&text=count(element)%20function%20returns%20the,given%20element%20exists%20in%20list.
+        if element_indices_to_be_deleted.count(ii) == 0:            
+            final_matching_decays.append({
+                'decay_id': elem['decay_id'],
+                'parent_id': elem['parent_id'],
+                'daughter_ids': elem['daughter_ids'],
+                'name': DecayType.objects.get(pk=elem['decay_id']).name_without_aliases
+            })
+    
+    print('final matching decays list! ', final_matching_decays)
+
+    if target_decay.is_two_body_decay():
+        original_decay = {
+            'decay_id': target_decay.id,
+            'parent_id': target_decay.parent.id,
+            'daughter_ids': [dt.daughter_one.id, dt.daughter_two.id],
+            'name': DecayType.objects.get(pk=target_decay.id).name_without_aliases
+        }
+        print('     computed name: ', DecayType.objects.get(pk=elem['decay_id']).name)
+        print('     computed readable name: ', DecayType.objects.get(pk=elem['decay_id']).human_readable_name)
+    else:
+        original_decay = {
+            'decay_id': target_decay.id,
+            'parent_id': target_decay.parent.id,
+            'daughter_ids': [dt.daughter_one.id, dt.daughter_two.id, dt.daughter_three.id],
+            'name': DecayType.objects.get(pk=target_decay.id).name_without_aliases
+        }
+        print('     computed name: ', DecayType.objects.get(pk=elem['decay_id']).name)
+        print('     computed readable name: ', DecayType.objects.get(pk=elem['decay_id']).human_readable_name)
+    
+    return Response({'original_decay': original_decay, 'matching_decays': final_matching_decays})
+
+def pop_matching_decays(target_particle_known, target_decay_particle, decay_type_list):
+
+    print('target particle known: ', target_particle_known)
+    print('target particle id: ', target_decay_particle.id)
+    print('target particle charge: ', target_decay_particle.charge)
+
+    dt_matches = True
+    matching_index = -1
+    if target_particle_known:
+        # ids must match
+        print('particle ids must match!')
+        for ii, elem in enumerate(decay_type_list, start=0):
+            print('decay id: ', elem['id'])
+            if elem['id'] == target_decay_particle.id:
+                matching_index = ii
+                print('we have a match! ', matching_index)
+    else:
+        print('particle charges must match')
+        for ii, elem in enumerate(decay_type_list, start=0):
+            print('decay charge: ', elem['charge'])
+            if elem['charge'] == target_decay_particle.charge:
+                matching_index = ii
+                print('we have a match! ', matching_index)
+
+    if matching_index > -1:
+        decay_type_list.pop(matching_index)
+    else:
+        dt_matches = False
+    return {'dt_matches': dt_matches, 'remaining_particles': decay_type_list}
+
+def list_elements_match_exactly(list_one, list_two):
+    """
+    list_one and list_two are assumed to be lists of integers.  This method checks if they contain 
+    exactly the same integers (although possibly in a different order).
+    """
+    print('inside method!')
+
+    if len(list_one) != len(list_two):
+        return False
+    
+    for elem in list_one:
+        try:
+            ii = list_two.index(elem)
+            list_two.pop(ii)
+        except:
+            return False
+
+    print('what is left of list_two: ', list_two)
+    return True
+
+@api_view(['GET'])
+#@permission_classes((IsAuthenticated, ))
+@permission_classes((AllowAny,))
 def generate_random_event(request):
     """
     Generate a random event.  b_field should be a number (strength of the B field in kG);
