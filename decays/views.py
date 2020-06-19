@@ -242,7 +242,7 @@ def user_list_this_institution(request):
 
 
 @api_view(['GET'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes((AllowAny,))
 def events_with_same_signature(request, id):
     """
     Returns a list of events that have the same event signature as the one
@@ -261,8 +261,8 @@ def events_with_same_signature(request, id):
 
     all_decays = DecayType.objects.all()
 
-    # number of particles in final state agree and the decay in question is not the target decay itself
-    decays_same_signature_first_pass = [dt for dt in all_decays if ((dt.is_two_body_decay() == target_decay.is_two_body_decay()) and (dt.id != target_decay.id))]
+    # number of particles in final state agree
+    decays_same_signature_first_pass = [dt for dt in all_decays if (dt.is_two_body_decay() == target_decay.is_two_body_decay())]
 
     print(decays_same_signature_first_pass)
 
@@ -372,13 +372,10 @@ def events_with_same_signature(request, id):
 
     element_indices_to_be_deleted = []
 
+    print('<><><> matching decays: ', matching_decays)
+
     for ii, elem in enumerate(matching_decays, start = 0):
         for jj in range(ii+1,len(matching_decays)):
-            print('ii, jj = ', ii,' ', jj)
-            #print(elem[ii])
-            #print(elem[jj]['parent_id'])
-            #print(elem[ii]['daughter_ids'])
-            #print(elem[jj]['daughter_ids'])
             if (elem['parent_id'] == matching_decays[jj]['parent_id']) and list_elements_match_exactly(elem['daughter_ids'], matching_decays[jj]['daughter_ids']):
                 print('>>> need to delete this element!')
                 element_indices_to_be_deleted.append(jj)
@@ -387,34 +384,52 @@ def events_with_same_signature(request, id):
     # https://treyhunner.com/2016/04/how-to-loop-with-indexes-in-python/
     for ii, elem in enumerate(matching_decays, start = 0):
         # https://thispointer.com/python-how-to-check-if-an-item-exists-in-list-search-by-value-or-condition/#:~:text=Check%20if%20element%20exist%20in%20list%20using%20list.&text=count(element)%20function%20returns%20the,given%20element%20exists%20in%20list.
-        if element_indices_to_be_deleted.count(ii) == 0:            
+        if element_indices_to_be_deleted.count(ii) == 0: 
+            parent = Particle.objects.get(pk=elem['parent_id'])
             final_matching_decays.append({
                 'decay_id': elem['decay_id'],
-                'parent_id': elem['parent_id'],
-                'daughter_ids': elem['daughter_ids'],
+                'parent': {
+                    'id': parent.id,
+                    'mass': parent.mass,
+                    'name': parent.name,
+                    'verbose_name': parent.verbose_name,
+                    'charge': parent.charge
+                },
+                'daughters': [{
+                    'id': daughter.id, 
+                    'mass': daughter.mass,
+                    'name': daughter.name,
+                    'verbose_name': daughter.verbose_name,
+                    'charge': daughter.charge
+                } for daughter in [Particle.objects.get(pk=daughter_id) for daughter_id in elem['daughter_ids']]],
                 'name': DecayType.objects.get(pk=elem['decay_id']).name_without_aliases
             })
     
     print('final matching decays list! ', final_matching_decays)
 
     if target_decay.is_two_body_decay():
-        original_decay = {
-            'decay_id': target_decay.id,
-            'parent_id': target_decay.parent.id,
-            'daughter_ids': [dt.daughter_one.id, dt.daughter_two.id],
-            'name': DecayType.objects.get(pk=target_decay.id).name_without_aliases
-        }
-        print('     computed name: ', DecayType.objects.get(pk=elem['decay_id']).name)
-        print('     computed readable name: ', DecayType.objects.get(pk=elem['decay_id']).human_readable_name)
+        target_daugther_id_list = [target_decay.daughter_one.id, target_decay.daughter_two.id]
     else:
-        original_decay = {
-            'decay_id': target_decay.id,
-            'parent_id': target_decay.parent.id,
-            'daughter_ids': [dt.daughter_one.id, dt.daughter_two.id, dt.daughter_three.id],
-            'name': DecayType.objects.get(pk=target_decay.id).name_without_aliases
-        }
-        print('     computed name: ', DecayType.objects.get(pk=elem['decay_id']).name)
-        print('     computed readable name: ', DecayType.objects.get(pk=elem['decay_id']).human_readable_name)
+        target_daugther_id_list = [target_decay.daughter_one.id, target_decay.daughter_two.id, target_decay.daughter_three.id]
+
+    original_decay = {
+        'decay_id': target_decay.id,
+        'parent': {
+            'id': target_decay.parent.id,
+            'mass': target_decay.parent.mass,
+            'name': target_decay.parent.name,
+            'verbose_name': target_decay.parent.verbose_name,
+            'charge': target_decay.parent.charge
+        },
+        'daughters': [{
+                    'id': daughter.id, 
+                    'mass': daughter.mass,
+                    'name': daughter.name,
+                    'verbose_name': daughter.verbose_name,
+                    'charge': daughter.charge
+                } for daughter in [Particle.objects.get(pk=daughter_id) for daughter_id in target_daugther_id_list]],
+        'name': DecayType.objects.get(pk=target_decay.id).name_without_aliases
+    }
     
     return Response({'original_decay': original_decay, 'matching_decays': final_matching_decays})
 
@@ -453,19 +468,22 @@ def list_elements_match_exactly(list_one, list_two):
     list_one and list_two are assumed to be lists of integers.  This method checks if they contain 
     exactly the same integers (although possibly in a different order).
     """
-    print('inside method!')
 
-    if len(list_one) != len(list_two):
+    # make a copy of list_two, since it is passed in by reference
+    new_list_two = []
+    for elem in list_two:
+        new_list_two.append(elem)
+
+    if len(list_one) != len(new_list_two):
         return False
     
     for elem in list_one:
         try:
-            ii = list_two.index(elem)
-            list_two.pop(ii)
+            ii = new_list_two.index(elem)
+            new_list_two.pop(ii)
         except:
             return False
-
-    print('what is left of list_two: ', list_two)
+    
     return True
 
 @api_view(['GET'])

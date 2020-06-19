@@ -320,6 +320,7 @@ class DecayType(models.Model):
                          'theta_lab': theta_lab,
                          'name': self.name,
                          'human_readable_name': self.human_readable_name,
+                         'event_type_id': self.id,
                          'parent': {
                              'particle_id': self.parent.id,
                              'particle_name': self.parent.name,
@@ -434,6 +435,7 @@ class DecayType(models.Model):
                          'theta_lab': theta_lab,
                          'name': self.name,
                          'human_readable_name': self.human_readable_name,
+                         'event_type_id': self.id,
                          'parent': {
                              'particle_id': self.parent.id,
                              'particle_name': self.parent.name,
