@@ -395,7 +395,7 @@ def events_with_same_signature(request, id):
                     'verbose_name': parent.verbose_name,
                     'charge': parent.charge
                 },
-                'daughters': [{
+                'decay_products': [{
                     'id': daughter.id, 
                     'mass': daughter.mass,
                     'name': daughter.name,
@@ -421,7 +421,7 @@ def events_with_same_signature(request, id):
             'verbose_name': target_decay.parent.verbose_name,
             'charge': target_decay.parent.charge
         },
-        'daughters': [{
+        'decay_products': [{
                     'id': daughter.id, 
                     'mass': daughter.mass,
                     'name': daughter.name,
