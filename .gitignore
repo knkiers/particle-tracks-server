@@ -4,3 +4,4 @@
 static/
 secret.py
 venv/
+get-pip.py
