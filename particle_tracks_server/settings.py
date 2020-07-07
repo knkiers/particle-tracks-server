@@ -64,7 +64,7 @@ ROOT_URLCONF = 'particle_tracks_server.urls'
 # https://pypi.python.org/pypi/django-cors-middleware/1.3.1
 # https://github.com/ottoyiu/django-cors-headers/issues/102
 # need to refine this at some point...!
-CORS_ORIGIN_ALLOW_ALL = True
+#CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -144,8 +144,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = '/static/'
-#STATIC_URL = 'https://particle-tracks.physics.taylor.edu/static/'
+#STATIC_URL = '/static/'
+STATIC_URL = 'https://particle-tracks.physics.taylor.edu/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
@@ -155,4 +155,4 @@ JWT_AUTH = {
 }
 
 # email:
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
