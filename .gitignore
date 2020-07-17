@@ -5,3 +5,5 @@ static/
 secret.py
 venv/
 get-pip.py
+private.yaml
+/ansible/host_vars

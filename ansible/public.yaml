@@ -1,0 +1,11 @@
+pt_server_repo: "https://github.com/knkiers/particle-tracks-server.git"
+pt_ui_repo: "https://github.com/knkiers/particle-tracks-ui.git"
+
+pt_ui_abs_dir: "{{ pt_app_abs_dir }}/ui"
+pt_server_abs_dir: "{{ pt_app_abs_dir }}/server"
+pt_pm2_abs_dir: "{{ pt_app_abs_dir }}/pm2"
+
+nginx_base_abs_dir: "/etc/nginx"
+nginx_available_abs_dir: "{{ nginx_base_abs_dir}}/sites-available"
+nginx_enabled_abs_dir: "{{ nginx_base_abs_dir}}/sites-enabled"
+nginx_conf_file: "particle-tracks.conf"
