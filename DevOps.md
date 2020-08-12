@@ -301,7 +301,7 @@ in the virtual environment.
     ```
 1. Build the user interface bundles:
     ```
-    sudo -u particle-tracks npm build
+    sudo -u particle-tracks npm run-script build
     ```
 
 ## Set up the Database
@@ -427,7 +427,7 @@ as `root`.
    ```
 1. Rebuild
    ```
-   sudo -u particle-tracks npm build
+   sudo -u particle-tracks npm run-script build
    ```
    
 ## Server
