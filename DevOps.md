@@ -213,7 +213,7 @@ of the `particle-tracks` account (e.g., `/home/particle-tracks`).
 1. Because you'll issue several commands as `particle-tracks`,
    it will be easiest to `sudo` to a shell as `particle-tracks`.
    ```
-   sudo -u particle-tracks-i
+   sudo -u particle-tracks -i
    ```
 1. Change to the Particle Tracks home directory
    ```
@@ -283,10 +283,13 @@ in the virtual environment.
 ## Collect Static Files
 
 1. Make sure the virtual environment is activate in your shell.
+1. Change to the proper directory
+   ```
+   cd $PT_HOME/server
+   ```
 1. Populate the Particle Tracks server `static` directory
    with required files:
    ```
-   cd $PT_HOME/server
    sudo -u particle-tracks ./manage.py collectstatic
    ``` 
 
@@ -306,7 +309,7 @@ in the virtual environment.
 Particle Tracks current uses [SQLite](https://www.sqlite.org/index.html).
 To install an existing database file:
 ```
-sudo -u particle-tracks cp <file> $PT_HOME/server/particle-tracks.db
+sudo -u particle-tracks cp <db-file> $PT_HOME/server/particle-tracks.db
 ```
 
 ## Configure Particle Tracks Server
@@ -315,7 +318,7 @@ The Particle Tracks server requires
 private configuration information.
 Install the configuration file:
 ```
-sudo -u particle-tracks cp <file> $PT_HOME/server/particle_tracks_server/secret.py
+sudo -u particle-tracks cp <secrets-file> $PT_HOME/server/particle_tracks_server/secret.py
 ```
 
 ## Configure Nginx
