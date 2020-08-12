@@ -282,7 +282,11 @@ in the virtual environment.
 
 ## Collect Static Files
 
-1. Make sure the virtual environment is activate in your shell.
+1. Start interactive shell and make sure the virtual environment is activate in your shell:
+```
+sudo -u particle-tracks -i
+source venv/bin/activate
+```
 1. Change to the proper directory
    ```
    cd $PT_HOME/server
@@ -290,7 +294,7 @@ in the virtual environment.
 1. Populate the Particle Tracks server `static` directory
    with required files:
    ```
-   sudo -u particle-tracks ./manage.py collectstatic
+   ./manage.py collectstatic
    ``` 
 
 ## Build the UI
@@ -442,7 +446,10 @@ as `root`.
    ```
 1. Rebuild static files (if they have changed)
    ```
-   sudo -u particle-tracks ./manage.py collectstatic
+   sudo -u particle-tracks -i
+   source venv/bin/activate
+   cd $PT_HOME/server
+   ./manage.py collectstatic
    ```
 1. Restart server in Supervisor
    (must be done as `root` user)
