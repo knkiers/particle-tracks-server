@@ -283,10 +283,10 @@ in the virtual environment.
 ## Collect Static Files
 
 1. Start interactive shell and make sure the virtual environment is activate in your shell:
-```
-sudo -u particle-tracks -i
-source venv/bin/activate
-```
+   ```
+   sudo -u particle-tracks -i
+   source venv/bin/activate
+   ```
 1. Change to the proper directory
    ```
    cd $PT_HOME/server
