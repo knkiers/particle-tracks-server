@@ -64,7 +64,10 @@ ROOT_URLCONF = 'particle_tracks_server.urls'
 # https://pypi.python.org/pypi/django-cors-middleware/1.3.1
 # https://github.com/ottoyiu/django-cors-headers/issues/102
 # need to refine this at some point...!
-#CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = ['https://particle-tracks.physics.taylor.edu']
+CSRF_TRUSTED_ORIGINS = ['https://particle-tracks.physics.taylor.edu']
+CSRF_ALLOWED_ORIGINS = ['https://particle-tracks.physics.taylor.edu']
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -73,7 +76,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 

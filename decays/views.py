@@ -14,7 +14,7 @@ from rest_framework.parsers import JSONParser
 #from django.utils.six import BytesIO
 
 from rest_framework import generics
-from rest_framework_jwt.settings import api_settings
+from rest_framework_simplejwt.settings import api_settings
 
 
 from django.contrib.auth.models import User

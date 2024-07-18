@@ -13,19 +13,24 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
+from django.urls import re_path, include
 from django.contrib import admin
-from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^', include('decays.urls')),
-    url(r'^api-token-auth/', obtain_jwt_token),
-    url(r'^api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^', include('decays.urls')),
+    re_path(r'^api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    re_path(r'^api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    re_path(r'^api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+    re_path(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 
 # the following is to allow login/logout from the browsable api
 urlpatterns += [
-    url(r'^api-auth/', include('rest_framework.urls',
-                               namespace='rest_framework')),
+   # re_path(r'^api-auth/', include('rest_framework.urls',
+   #                            namespace='rest_framework')),
 ]
