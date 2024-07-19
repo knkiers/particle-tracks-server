@@ -449,3 +449,17 @@ as `root`.
    ```
    sudo supervisorctl restart particle-tracks-server
    ```
+
+## Migration to Ubuntu 22.04/Django 5
+
+1. Upgraded Server
+   ```
+   do-release-upgrade
+   ```
+1. Changed requirements.txt to a looser format to resolve upgrade issues. When we are happy with the versions, do a `pip freeze` with a stable version combination to avoid long build times.
+
+1. Changed `particle_tracks_server/settings.py` with CORS and CSRF lists. These are questionably functional. Also changed to rest_framework_simplejwt, since the old version was no longer supported.
+
+1. Changed urls.py in both the particle_tracks_server folder and the decays folder. In both cases,  I changed the url function to the re_path function, since the url funtion is no longer supported. (see https://stackoverflow.com/questions/70319606/importerror-cannot-import-name-url-from-django-conf-urls-after-upgrading-to) I also added language related to the view necessary for the simplejwt module to work. (see https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html)
+
+1. Updated the import section of decays/views.py to reflect the use of rest_fromework_simplejwt
